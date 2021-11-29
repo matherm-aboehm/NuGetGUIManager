@@ -176,7 +176,7 @@ async function findPackages(){
   selectedFindedPackageIndex = -1;
 
   // バージョンリストの表示をパッケージ未選択の状態に設定
-  document.getElementById("findedPackageVersions").innerHTML = '<option value="-1">パッケージを選択してください。</option>';
+  document.getElementById("findedPackageVersions").innerHTML = '<option value="-1">' + selectPackageJS + '</option>';
 
   // 追加ボタンを無効化
   document.getElementById("addButton").disabled = true;
@@ -295,7 +295,7 @@ async function findPackagesFromNuGetServer(queryString, getPrerelease){
   }
 
   // 結局検索に失敗した場合全ての検索エラーをスローする
-  throw new Error('検索に失敗しました。(' + errors + ')');
+  throw new Error(searchFailed + ' (' + errors + ')');
 }
 
 //--------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ async function getNugetServiceURLs(){
     servieceIndex = serviceGetResult.data;
   }
   catch(err){
-    throw new Error('NuGetのサービスインデックスが取得できませんでした。設定の「serviceIndexURL」を確認してください。(' + err + ')');
+    throw new Error(serviceIndexError + ' (' + err + ')');
   }
 
   // サービスバージョンの確認（メジャーバージョンが3以外はエラー）
@@ -343,41 +343,16 @@ async function getNugetServiceURLs(){
 //    description     パッケージの説明
 //--------------------------------------------------------------------------------
 function createPackageElement(listType, index, name, iconURL, description , detailURL){
-  if(iconURL){
-    // アイコンURLが無い場合
-    return `
-      <table class="package" onclick="selectPackage( '${listType}','${index}')" packageindex="${index}">
-        <tr>
-          <td rowspan="2" class="package-icon" >
-            <img class="icon" src="${iconURL}">
-          </td>
-          <td class="package-text">
-            <div class="package-title">
-              ${name} <a href='${detailURL}'>詳細（外部リンク）</a>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="package-text">
-            <div class="package-description">
-              ${description}
-            </div>
-          </td>
-        </tr>
-      </table>
-    `;
-  }
-  else{
-    // アイコンURLが有る場合
-    return `
-    <table class="package" onclick="selectPackage('${listType}','${index}')" packageindex="${index}">
+  return `
+    <table class="package" onclick="selectPackage( '${listType}','${index}')" packageindex="${index}">
       <tr>
         <td rowspan="2" class="package-icon" >
-          <img class="icon" src="https://www.nuget.org/Content/gallery/img/default-package-icon.svg">
-         </td>
+          <img class="icon" src="${iconURL ?? packageIconURL}"
+              onerror="if (this.src != '${packageIconURL}') this.src = '${packageIconURL}';">
+        </td>
         <td class="package-text">
           <div class="package-title">
-            ${name} <a href='${detailURL}'>詳細（外部リンク）</a>
+            ${name} <a href='${detailURL}'>${detailURLLabel}</a>
           </div>
         </td>
       </tr>
@@ -390,7 +365,6 @@ function createPackageElement(listType, index, name, iconURL, description , deta
       </tr>
     </table>
   `;
-  }
 }
 
 //--------------------------------------------------------------------------------
@@ -426,9 +400,10 @@ async function setInstalledPackageList(packageList){
       const detailURL = getDetailURL(packageList[i].name, packageList[i].resolveVersion);
       // パッケージ名からサーバーからのパッケージ情報を取得して設定する
       packageList[i].packageInfo = await getPackageInfo(packageList[i].name);
+      if(packageList[i].packageInfo) {
       // logDiv.innerHTML += "name:" + packageList[i].name + ",iconUrl:" + packageList[i].packageInfo.iconUrl + ",descript:" + packageList[i].packageInfo.description + ",url:" + detailURL + "<br/>";
-      document.getElementById("installedPackages").innerHTML += createPackageElement("installed", i, packageList[i].name, packageList[i].packageInfo.iconUrl, packageList[i].packageInfo.description, detailURL);
-      
+        document.getElementById("installedPackages").innerHTML += createPackageElement("installed", i, packageList[i].name, packageList[i].packageInfo.iconUrl, packageList[i].packageInfo.description, detailURL);
+      }
     }
   }
 

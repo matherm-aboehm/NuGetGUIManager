@@ -6,7 +6,8 @@
 		{
 			"type": "npm",
 			"script": "watch",
-			"problemMatcher": "$tsc-watch",
+			//https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/tasks/common/problemMatcher.ts
+			"problemMatcher": "$gulp-tsc6-watch",
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never"
@@ -18,16 +19,44 @@
 		},
 		{
 			"type": "npm",
-			"script": "vsce publish",
+			"script": "compile",
+			"group": "build",
+			"problemMatcher": [
+				"$gulp-tsc6"
+			],
+			"label": "npm: compile"
+		},
+		{
+			"type": "gulp",
+			"task": "clean",
 			"problemMatcher": [],
-			"label": "npm: publishpackage",
+			"label": "gulp: clean"
+		},
+		{
+			"type": "gulp",
+			"task": "build",
+			"group": "build",
+			"problemMatcher": [
+				"$gulp-tsc6"
+			],
+			"label": "gulp: build"
+		},
+		{
+			"type": "gulp",
+			"task": "publish",
+			"problemMatcher": [
+				"$gulp-tsc6"
+			],
+			"label": "gulp: publish",
 			"detail": "vsce publish"
 		},
 		{
-			"type": "npm",
-			"script": "vsce package",
-			"problemMatcher": [],
-			"label": "npm: package",
+			"type": "gulp",
+			"task": "package",
+			"problemMatcher": [
+				"$gulp-tsc6"
+			],
+			"label": "gulp: package",
 			"detail": "vsce package"
 		}
 	]

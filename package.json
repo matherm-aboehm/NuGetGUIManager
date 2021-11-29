@@ -43,10 +43,10 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
+		"compile": "gulp compile",
+		"clean": "gulp clean",
+		"watch": "gulp watch",
+		"pretest": "gulp build && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js"
 	},
@@ -59,13 +59,23 @@
 		"@typescript-eslint/eslint-plugin": "^4.9.0",
 		"@typescript-eslint/parser": "^4.9.0",
 		"glob": "^7.1.6",
+		"del": "^6.0.0",
+		"event-stream": "^4.0.1",
+		"gulp": "^4.0.2",
+		"gulp-filter": "^6.0.0",
+		"gulp-sourcemaps": "^3.0.0",
+		"gulp-typescript": "^6.0.0-alpha.1",
+		"run-sequence": "^2.2.1",
 		"mocha": "^8.1.3",
 		"typescript": "^4.1.2",
+		"vsce": "^2.4.0",
+		"vscode-nls-dev": "^3.3.2",
 		"vscode-test": "^1.4.1"
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
 		"iconv-lite": "^0.6.2",
-		"jschardet": "^2.2.1"
+		"jschardet": "^2.2.1",
+		"vscode-nls": "^5.0.0"
 	}
 }

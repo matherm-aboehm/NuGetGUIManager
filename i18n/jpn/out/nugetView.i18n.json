@@ -9,9 +9,13 @@
     "searchMessage" : "検索してください",
     "canAdd": "追加してもよろしいですか？",
     "add" : "追加",
-    "seacrh" : "検索",
+    "search" : "検索",
     "update" : "更新",
     "delete" : "削除",
     "canUpdate" : "更新してもよろしいですか？",
-    "canDelete" : "削除してもよろしいですか？"
+    "canDelete" : "削除してもよろしいですか？",
+    "selectPackageJS": "パッケージを選択してください。",
+    "searchFailed": "検索に失敗しました。",
+    "serviceIndexError": "NuGetのサービスインデックスが取得できませんでした。設定の「serviceIndexURL」を確認してください。",
+    "detailURLLabel": "詳細（外部リンク）"
 }

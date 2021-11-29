@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import * as nuget from './nuget';
 import * as path from 'path';
-import {localeString} from './extension';
+
+let localize = nls.loadMessageBundle();
 
 // オープンしているNuGet管理ビューの管理リスト。プロジェクトファイルをキーにしている
 let views: { [name: string]: vscode.WebviewPanel } = {};
@@ -11,15 +13,14 @@ let views: { [name: string]: vscode.WebviewPanel } = {};
 //    context           拡張機能のコンテキスト
 //    projectFilePath   プロジェクトファイルパス
 //====================================================================================================
-export function openNugetView(context: vscode.ExtensionContext, projectFilePath:string) {
+export function openNugetView(context: vscode.ExtensionContext, projectFilePath: string) {
 
   // プロジェクトファイルに関連付けられたNuGet管理ビューの存在確認
-  if(views[projectFilePath] === undefined)
-  {
+  if (views[projectFilePath] === undefined) {
     // ビューがなかったので作成する
     createNugetView(context, projectFilePath);
   }
-  else{
+  else {
     // 既にあるのでアクティブにする
     views[projectFilePath].reveal(vscode.ViewColumn.One);
   }
@@ -30,13 +31,12 @@ export function openNugetView(context: vscode.ExtensionContext, projectFilePath:
 //    context           拡張機能のコンテキスト
 //    projectFilePath   プロジェクトファイルパス
 //====================================================================================================
-function createNugetView(context: vscode.ExtensionContext, projectFilePath:string)
-{
+function createNugetView(context: vscode.ExtensionContext, projectFilePath: string) {
   // プロジェクトファイルパスからファイル名の部分を取り出す
-  let filename =  path.basename(projectFilePath);
+  let filename = path.basename(projectFilePath);
 
   // NuGet用のWebViewを構築する
-  const panel =  vscode.window.createWebviewPanel(
+  const panel = vscode.window.createWebviewPanel(
     'NuGetManager',
     'NuGet Manager(' + filename + ')',
     vscode.ViewColumn.One,
@@ -46,32 +46,38 @@ function createNugetView(context: vscode.ExtensionContext, projectFilePath:strin
   );
 
   // NuGet用のWebViewにコンテンツを設定する
-  panel.webview.html = getWebviewContent(context, 'view/view.html',{
-    projectPath:escape(projectFilePath),
-    scriptPath:getWevUriPath(context, panel, 'view/view.js'),
-    stylePath:getWevUriPath(context, panel, 'view/view.css'),
-    axiosPath:getWevUriPath(context, panel, 'node_modules/axios/dist/axios.min.js'),
-    serviceIndexURL:"" + vscode.workspace.getConfiguration('NugetGUIManager').get('serviceIndexURL'),
-    titlRegisPackage:localeString("titlRegisPackage"),
-    gettingPackages:localeString("gettingPackages"),
-    selectPackage:localeString("selectPackage"),
-    sarchMessage:localeString("Search"),
-    condition:localeString("condition"),
-    includePrerelease:localeString("includePrerelease"),
-    searchMessage:localeString("searchMessage"),
-    canAdd:localeString("canAdd"),
-    add:localeString("add"),
-    seacrh:localeString("seacrh"),
-    update:localeString("update"),
-    delete:localeString("delete"),
-    canUpdate:localeString("canUpdate"),
-    canDelete:localeString("canDelete")
+  panel.webview.html = getWebviewContent(context, 'view/view.html', {
+    projectPath: escape(projectFilePath),
+    scriptPath: getWevUriPath(context, panel, 'view/view.js'),
+    stylePath: getWevUriPath(context, panel, 'view/view.css'),
+    axiosPath: getWevUriPath(context, panel, 'node_modules/axios/dist/axios.min.js'),
+    packageIconURL: getWevUriPath(context, panel, 'resources/default-package-icon.svg'),
+    serviceIndexURL: "" + vscode.workspace.getConfiguration('NugetGUIManager').get('serviceIndexURL'),
+    titlRegisPackage: localize("titlRegisPackage", "Registed Packages"),
+    gettingPackages: localize("gettingPackages", "Getting packages in project..."),
+    installedVersion: localize("installedVersion", "Installed version"),
+    selectPackage: localize("selectPackage", "Select Package"),
+    sarchMessage: localize("sarchMessage", "Search package"),
+    condition: localize("condition", "Condition"),
+    includePrerelease: localize("includePrerelease", "Include PreRelease Version"),
+    searchMessage: localize("searchMessage", "Do Search!"),
+    canAdd: localize("canAdd", "Do you want to Add it?"),
+    add: localize("add", "Add"),
+    search: localize("search", "Search"),
+    update: localize("update", "Update"),
+    delete: localize("delete", "Delete"),
+    canUpdate: localize("canUpdate", "Do you want to Update it??"),
+    canDelete: localize("canDelete", "Do you want to Delete it??"),
+    selectPackageJS: localize("selectPackageJS", "Please select a package."),
+    searchFailed: localize("searchFailed", "Search failed."),
+    serviceIndexError: localize("serviceIndexError", "The NuGet service index could not be obtained. Check the \\\"serviceIndexURL\\\" in the settings."),
+    detailURLLabel: localize("detailURLLabel", "Details (external link)")
   });
 
   // パネルの表示非表示が変更されたイベントの処理（再表示された時に初期表示に戻るため）
   panel.onDidChangeViewState((e) => {
     // 非表示→表示になった時にインストール済みのパッケージリストを設定する
-    if(e.webviewPanel.visible){
+    if (e.webviewPanel.visible) {
       setInstalledPackaghes(context, panel, projectFilePath);
     }
   });
@@ -79,9 +85,8 @@ function createNugetView(context: vscode.ExtensionContext, projectFilePath:strin
   // パネルが破棄された時に管理用のリストから削除するイベント処理を設定する
   panel.onDidDispose(() => {
     Object.keys(views).forEach(key => {
-      if(views[key] === panel)
-      {
-        delete  views[key];
+      if (views[key] === panel) {
+        delete views[key];
       }
     });
   });
@@ -101,34 +106,30 @@ function createNugetView(context: vscode.ExtensionContext, projectFilePath:strin
 //    context     拡張機能のコンテキスト
 //    panel       NuGet管理ビュー
 //====================================================================================================
-async function setDidReceiveMessage(context: vscode.ExtensionContext, panel:vscode.WebviewPanel)
-{
+async function setDidReceiveMessage(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
   // NuGet管理ビューからの処理要求のハンドラを登録
   panel.webview.onDidReceiveMessage(
     message => {
-      
-      const projFilePath = unescape( message.projectfile);
 
-      if(message.command === 'add')
-      {
+      const projFilePath = unescape(message.projectfile);
+
+      if (message.command === 'add') {
         // 追加コマンド
-        nuget.addPackage(projFilePath, message.package, message.version).then(result =>{
+        nuget.addPackage(projFilePath, message.package, message.version).then(result => {
           panel.dispose();
           createNugetView(context, projFilePath);
         });
-     }
-      else if(message.command === 'update')
-      {
+      }
+      else if (message.command === 'update') {
         // 更新コマンド
-        nuget.updatePackage(projFilePath, message.package, message.version).then(result =>{
+        nuget.updatePackage(projFilePath, message.package, message.version).then(result => {
           panel.dispose();
           createNugetView(context, projFilePath);
         });
-       }
-      else if(message.command === 'delete')
-      {
+      }
+      else if (message.command === 'delete') {
         // 削除コマンド
-        var p = nuget.deletePackage(projFilePath, message.package).then(result =>{
+        var p = nuget.deletePackage(projFilePath, message.package).then(result => {
           panel.dispose();
           createNugetView(context, projFilePath);
         });
@@ -145,12 +146,11 @@ async function setDidReceiveMessage(context: vscode.ExtensionContext, panel:vsco
 //    panel             NuGet管理ビュー
 //    projectFilePath   プロジェクトファイルパス
 //====================================================================================================
-function setInstalledPackaghes(context: vscode.ExtensionContext, panel:vscode.WebviewPanel, projectFilePath:string)
-{
+function setInstalledPackaghes(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, projectFilePath: string) {
   // プロジェクトファイルからパッケージリストを取得してWebViewに表示する
   nuget.getList(projectFilePath).then(packageList => {
     // WebViewへのメッセージ送信を利用してパッケージリストを表示す
-    panel.webview.postMessage({ command: 'setPackageList', serviceIndexURL: "" + vscode.workspace.getConfiguration('NugetGUIManager').get('serviceIndexURL') , list: packageList });
+    panel.webview.postMessage({ command: 'setPackageList', serviceIndexURL: "" + vscode.workspace.getConfiguration('NugetGUIManager').get('serviceIndexURL'), list: packageList });
   });
 }
 
@@ -160,8 +160,7 @@ function setInstalledPackaghes(context: vscode.ExtensionContext, panel:vscode.We
 //    panel             WebViewのパネル
 //    relativePath      拡張機能の基本フォルダからの相対パス
 //====================================================================================================
-function getWevUriPath(context: vscode.ExtensionContext, panel:vscode.WebviewPanel, relativePath: string)
-{
+function getWevUriPath(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, relativePath: string) {
   // NuGet管理のWebViewで利用するWebView内で利用可能なURIを取得する
   const onScriptPath = vscode.Uri.file(
     path.join(context.extensionPath, relativePath)
@@ -175,7 +174,7 @@ function getWevUriPath(context: vscode.ExtensionContext, panel:vscode.WebviewPan
 //  fileRelativePath  htmlファイルの拡張機能の基本フォルダからの相対パス
 //  replaceValues     置換文字列の（変数名:値)の配列。${変数名} がプレースフォルダとなる（テンプレートリテラルに似せている）
 //====================================================================================================
-function getWebviewContent(context: vscode.ExtensionContext, fileRelativePath: string, replaceValues:{[key:string]:string}) :string{
+function getWebviewContent(context: vscode.ExtensionContext, fileRelativePath: string, replaceValues: { [key: string]: string }): string {
 
   // ファイル操作モジュールの追加
   var fs = require('fs');
@@ -190,7 +189,7 @@ function getWebviewContent(context: vscode.ExtensionContext, fileRelativePath: s
   Object.keys(replaceValues).forEach(key => {
     html = replaceAll(html, '\\$\\{' + key + '\\}', replaceValues[key]);
   });
-  
+
   // すべて置換したものを返す
   return html;
 }
@@ -201,7 +200,7 @@ function getWebviewContent(context: vscode.ExtensionContext, fileRelativePath: s
 //  oldStr      置換する対象の文字列
 //  newStr      置換処理で置き換える文字列
 //====================================================================================================
-function replaceAll(sourceStr:string, oldStr:string, newStr:string){
+function replaceAll(sourceStr: string, oldStr: string, newStr: string) {
   var reg = new RegExp(oldStr, "g");
   return sourceStr.replace(reg, newStr);
 }

@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- inline script block must be before any external resource loading, to get debugger to work: -->
+    <!-- https://bugs.chromium.org/p/chromium/issues/detail?id=978325 -->
+    <script type="text/javascript" id="_setGlobalVars">
+      globalThis.selectPackageJS = "${selectPackageJS}";
+      globalThis.searchFailed = "${searchFailed}";
+      globalThis.serviceIndexError = "${serviceIndexError}";
+      globalThis.detailURLLabel = "${detailURLLabel}";
+      globalThis.packageIconURL = "${packageIconURL}";
+    </script>
     <link rel="stylesheet" href="${stylePath}" type="text/css" />
     <script type="text/javascript" src="${axiosPath}" ></script>
     <script type="text/javascript" src="${scriptPath}" ></script>
@@ -44,7 +53,7 @@
     <tr>
       <td>
         ${sarchMessage}
-        ${condition}<input id="condition" type="text" style="width:300px"><input id="findButton" type="button" disabled onclick="findPackages();" value="${seacrh}" disable><br />
+        ${condition}<input id="condition" type="text" style="width:300px"><input id="findButton" type="button" disabled onclick="findPackages();" value="${search}" disable><br />
         <input type="checkbox" id="getprerelease">${includePrerelease}
       </td>
     </tr>
