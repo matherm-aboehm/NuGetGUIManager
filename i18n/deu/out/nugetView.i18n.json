@@ -1,0 +1,21 @@
+{
+    "titlRegisPackage": "Installierte NuGet-Pakete",
+    "gettingPackages" : "NuGet-Pakete werden im Projekt abgerufen...",
+    "installedVersion": "Installierte Version",
+    "selectPackage" : "NuGet-Paket auswählen",
+    "sarchMessage" : "NuGet-Paket suchen",
+    "condition" : "Bedingung",
+    "includePrerelease" : "Vorabversion einbeziehen",
+    "searchMessage" : "Suchen!",
+    "canAdd" : "Wollen Sie dieses NuGet-Paket hinzufügen?",
+    "add" : "Hinzufügen",
+    "search" : "Suchen",
+    "update" : "Aktualisieren",
+    "delete" : "Deinstallieren",
+    "canUpdate" : "Wollen Sie dieses NuGet-Paket aktualisieren?",
+    "canDelete" : "Wollen Sie dieses NuGet-Paket entfernen?",
+    "selectPackageJS": "Bitte wählen Sie ein NuGet-Paket aus.",
+    "searchFailed": "Suche fehlgeschlagen",
+    "serviceIndexError": "Der NuGet-Dienst-Index konnte nicht abgerufen werden. Überprüfen Sie die \\\"serviceIndexURL\\\" in den Einstellungen.",
+    "detailURLLabel": "Details (externer Link)"
+}
