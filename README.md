@@ -50,6 +50,12 @@ Set NuGet server URL.(default value is 'https://api.nuget.org/v3/index.json')
 ## Release Notes
 <div style="padding-left:1em">
 
+* 0.0.6
+<div style="padding-left:3em">
+Use vscode-nls for localization and add german localization.
+Fixed missing localization in javascript.
+</div>
+
 * 0.0.5
 <div style="padding-left:3em">
 Fixed cant listed when prelelease compornent existed.
